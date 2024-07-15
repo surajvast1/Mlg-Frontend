@@ -61,9 +61,7 @@ const SearchBar = () => {
   };
 
   const sendImdbIdToBackend = async (imdbId, imdbName) => {
-    // const URL = 'http://localhost:8002/scrape_reviews';
-    // const URL = 'http://backend-backend-1:8002/scrape_reviews';
-    const URL = 'http://backend-backend-1/scrape_reviews';
+    const URL = 'http://sentimental-analyser-backend.shubhamshrivastava.co.in/scrape_reviews';  // Updated URL
     try {
       setLoading(true); // Set loading to true before the request
       const response = await axios.post(URL, { imdb_id: imdbId, imdb_name: imdbName });
@@ -80,13 +78,13 @@ const SearchBar = () => {
     }
   };
 
-  const handleViewExcel = () => {
-    if (fileUrl) {
-      window.open(`http://backend-backend-1/download/${fileUrl}`, '_blank');
-    } else {
-      console.error("File URL is not available");
-    }
-  };
+  // const handleViewExcel = () => {
+  //   if (fileUrl) {
+  //     window.open(`http://backend-backend-1/download/${fileUrl}`, '_blank');
+  //   } else {
+  //     console.error("File URL is not available");
+  //   }
+  // };
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -301,7 +299,7 @@ const SearchBar = () => {
                   </button>
                 </div>
 
-                {/* Button to download Excel sheet */}
+                {/* Button to download Excel sheet
                   {fileUrl && (
                     <button
                       className="excel-button"
@@ -309,7 +307,7 @@ const SearchBar = () => {
                     >
                       Download Excel Sheet
                     </button>
-                  )}
+                  )} */}
 
 
           <button className="aa bb cc dd imdb-button" onClick={() => window.open(`https://www.imdb.com/title/${selectedMovieDetails.imdbID}`, '_blank')}>
