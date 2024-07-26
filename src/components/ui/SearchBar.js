@@ -2,24 +2,15 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { pieArcLabelClasses } from '@mui/x-charts';
-import Loader from './Loader'; // Import the Loader component
+import Loader from './Loader'; // Ensure this component exists
 
 const SearchBar = () => {
-
- 
-
-
   const [query, setQuery] = useState('');
   const [movies, setMovies] = useState([]);
   const [selectedMovieDetails, setSelectedMovieDetails] = useState(null);
   const [pos, setPos] = useState(0);
   const [neg, setNeg] = useState(0);
   const [loading, setLoading] = useState(false); // State to manage loading
-  const [fileUrl, setFileUrl] = useState(null); // State to store file URL after generation
-  const [acc,SetAcc] = useState(0);
-
-  
-
 
   const data = [
     { value: pos, label: 'Positive', color: '#40A578' },
@@ -30,13 +21,12 @@ const SearchBar = () => {
     width: 400,
     height: 400,
   };
-
   const loadMovies = async (searchTerm) => {
     if (!searchTerm) {
       setMovies([]);
       return;
     }
-    const URL = `https://omdbapi.com/?s=${searchTerm}&page=1&apikey=fc1fef96`;
+    const URL = `https://www.omdbapi.com/?s=${searchTerm}&page=1&apikey=fc1fef96`; // Updated to HTTPS
     try {
       const response = await axios.get(URL);
       if (response.data.Response === "True") {
@@ -50,41 +40,39 @@ const SearchBar = () => {
   };
 
   const loadMovieDetails = async (movieId) => {
-    const URL = `http://www.omdbapi.com/?i=${movieId}&apikey=fc1fef96`;
+    const URL = `https://www.omdbapi.com/?i=${movieId}&apikey=fc1fef96`; // Updated to HTTPS
     try {
       const response = await axios.get(URL);
       setSelectedMovieDetails(response.data);
       sendImdbIdToBackend(movieId, response.data.Title);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching data:", error); 
     }
   };
 
+   
   const sendImdbIdToBackend = async (imdbId, imdbName) => {
-    const URL = 'http://sentimental-analyser-backend.shubhamshrivastava.co.in/scrape_reviews';  // Updated URL
+    // const URL = 'http://backend:8002/scrape_reviews';  // Adjusted to internal Docker service name and port
+    const URL = 'https://sentimental-analyser-backend.shubhamshrivastava.co.in/scrape_reviews';
     try {
-      setLoading(true); // Set loading to true before the request
-      const response = await axios.post(URL, { imdb_id: imdbId, imdb_name: imdbName });
-      setPos(response.data.positive_count);
-      setNeg(response.data.negative_count);
-      setFileUrl(response.data.file_name);
-      SetAcc(response.data.accuracy);
-      // generateRandomAccuracy();
-
-      setLoading(false); // Set loading to false after the request
+        setLoading(true); // Set loading to true before the request
+        const response = await axios.post(URL, { imdb_id: imdbId, imdb_name: imdbName }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'  
+            }
+        });
+        setPos(response.data.positive_count);
+        setNeg(response.data.negative_count);
+        setLoading(false); // Set loading to false after the request
     } catch (error) {
-      console.error("Error sending IMDb ID to backend:", error);
-      setLoading(false); // Set loading to false in case of error
+        console.error("Error sending IMDb ID to backend:", error);
+        setLoading(false); // Set loading to false in case of error
     }
-  };
+};
 
-  // const handleViewExcel = () => {
-  //   if (fileUrl) {
-  //     window.open(`http://backend-backend-1/download/${fileUrl}`, '_blank');
-  //   } else {
-  //     console.error("File URL is not available");
-  //   }
-  // };
+
+
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -100,15 +88,12 @@ const SearchBar = () => {
     setQuery('');
     setMovies([]);
     loadMovieDetails(movie.imdbID);
-    setFileUrl(null); // Reset file URL state
   };
 
   return (
     <div>
       <style>
         {`
-          /* Your existing CSS styles */
-
           input {
             padding: 10px;
             margin: 5px;
@@ -161,62 +146,51 @@ const SearchBar = () => {
             align-items: center;
             justify-content: center;
           }
-          
           .sentiment-buttons {
             display: flex;
-            gap: 10px; /* Adjust the gap between buttons */
-            margin:20px;
+            gap: 10px;
+            margin: 20px;
           }
-          
           .positive-button,
           .negative-button {
-            padding: 10px 20px; /* Adjust padding as needed */
+            padding: 10px 20px;
             font-size: 1.2em;
             font-weight: bold;
             border: none;
             cursor: pointer;
-            transition: background-color 0.3s ease, opacity 0.3s ease; /* Added opacity transition */
-            border-radius: 5px; /* Rounded corners */
-            color: black; /* Text color */
-            margin-right: 10px; /* Adjust right margin */
+            transition: background-color 0.3s ease, opacity 0.3s ease;
+            border-radius: 5px;
+            color: black;
+            margin-right: 10px;
           }
-          
           .positive-button {
             background-color: #c3e6cb;
           }
-          
           .negative-button {
             background-color: #f5c6cb;
           }
-          
-          /* Hover effect */
           .positive-button:hover,
           .negative-button:hover {
-            opacity: 0.9; /* Reduce opacity on hover */
+            opacity: 0.9;
           }
-
           .excel-button {
-            padding: 10px 20px; /* Adjust padding as needed */
+            padding: 10px 20px;
             font-size: 1.2em;
             font-weight: bold;
-            margin:10px;
+            margin: 10px;
             border: none;
             cursor: pointer;
-            transition: background-color 0.3s ease, opacity 0.3s ease; /* Added opacity transition */
-            border-radius: 5px; /* Rounded corners */
-            color: black; /* Text color */
-            background-color: #007bff; /* Blue color */
+            transition: background-color 0.3s ease, opacity 0.3s ease;
+            border-radius: 5px;
+            color: black;
+            background-color: #007bff;
           }
-          
           .excel-button:hover {
-            opacity: 0.8; /* Reduce opacity on hover */
+            opacity: 0.8;
           }
-
-          .imdb-button{
-            margin:20px;
+          .imdb-button {
+            margin: 20px;
           }
-          
-          
         `}
       </style>
       <form onSubmit={(e) => e.preventDefault()}>
@@ -289,36 +263,14 @@ const SearchBar = () => {
                     />
                   </div>
                 )}
-
                 <div className="sentiment-buttons">
-                  <button className="positive-button" onClick={() => handleViewExcel()}>
+                  <button className="positive-button">
                     Positive Sentiments ({pos})
                   </button>
-                  <button className="negative-button" onClick={() => handleViewExcel()}>
-                     Negative Sentiments ({neg})
+                  <button className="negative-button">
+                    Negative Sentiments ({neg})
                   </button>
                 </div>
-
-                {/* Button to download Excel sheet
-                  {fileUrl && (
-                    <button
-                      className="excel-button"
-                      onClick={() => window.open(`http://backend-backend-1/download/${fileUrl}`, '_blank')}
-                    >
-                      Download Excel Sheet
-                    </button>
-                  )} */}
-
-
-          <button className="aa bb cc dd imdb-button" onClick={() => window.open(`https://www.imdb.com/title/${selectedMovieDetails.imdbID}`, '_blank')}>
-                <i class="fa fa-imdb" aria-hidden="true"></i> Rate it on IMDb
-                </button>
-
-
-                {/* <button className="aa bb cc dd imdb-button">
-                <i class="fa fa-imdb" aria-hidden="true"></i> Accuracy is({acc})
-                </button> */}
-                
               </div>
             )}
           </div>
@@ -329,45 +281,4 @@ const SearchBar = () => {
 };
 
 export default SearchBar;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
